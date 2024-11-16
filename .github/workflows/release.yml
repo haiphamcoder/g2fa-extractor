@@ -9,8 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build-ubuntu-20.04:
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -18,40 +18,43 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y protobuf-c-compiler libprotobuf-c-dev gcc make dpkg-dev ruby ruby-dev
-          sudo gem install fpm
+          sudo apt install -y protobuf-c-compiler libprotobuf-c-dev gcc make dpkg-dev
 
       - name: Build project
         run: make
 
-      - name: Package as .deb
+      - name: Package as .deb using dpkg-deb
         run: |
-          mkdir -p dist/linux
-          cp bin/g2fa-extractor dist/linux/
-          cd dist/linux
-          fpm -s dir -t deb -n g2fa-secret-extractor -v ${GITHUB_REF##*/v} g2fa-extractor=/usr/local/bin/g2fa-extractor
+          mkdir -p dist/ubuntu-20.04/g2fa-secret-extractor/usr/local/bin
+          cp bin/g2fa-extractor dist/ubuntu-20.04/g2fa-secret-extractor/usr/local/bin/
+          mkdir -p dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN
+          echo "Package: g2fa-secret-extractor" > dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
+          echo "Version: ${GITHUB_REF##*/v}" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
+          echo "Architecture: amd64" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
+          echo "Maintainer: Hai Pham Ngoc <ngochai285nd@gmail.com>" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
+          echo "Description: G2FA Secret Extractor" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
+          dpkg-deb --build dist/ubuntu-20.04/g2fa-secret-extractor
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: g2fa-secret-extractor-linux
-          path: dist/linux/*.deb
+          name: g2fa-secret-extractor-ubuntu-20.04
+          path: dist/ubuntu-20.04/*.deb
 
   release:
     runs-on: ubuntu-latest
-    needs: [build-linux]
+    needs: [build-ubuntu-20.04]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download Linux artifact
+      - name: Download artifact (Ubuntu 20.04)
         uses: actions/download-artifact@v3
         with:
-          name: g2fa-secret-extractor-linux
-          path: dist/linux/
+          name: g2fa-secret-extractor-ubuntu-20.04
 
       - name: List downloaded files
-        run: ls -lh dist/linux/
+        run: ls -lh dist/
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
@@ -61,4 +64,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
           prerelease: false
-          artifacts: dist/linux/*.deb
+          artifacts: |
+            dist/ubuntu-20.04/*.deb
