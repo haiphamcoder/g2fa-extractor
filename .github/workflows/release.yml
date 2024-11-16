@@ -36,11 +36,11 @@ jobs:
           echo "Architecture: amd64" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
           echo "Maintainer: Hai Pham Ngoc <ngochai285nd@gmail.com>" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
           echo "Description: G2FA Secret Extractor" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
-          dpkg-deb --build dist/ubuntu-20.04/g2fa-secret-extractor
+          dpkg-deb --build dist/ubuntu-20.04/g2fa-secret-extractor "dist/ubuntu-20.04/g2fa-secret-extractor_${GITHUB_REF##*/v}_ubuntu-20.04_amd64.deb"
 
       - name: Verify .deb file exists
         run: |
-          if [ ! -f dist/ubuntu-20.04/g2fa-secret-extractor.deb ]; then
+          if [ ! -f dist/ubuntu-20.04/g2fa-secret-extractor_${GITHUB_REF##*/v}_ubuntu-20.04_amd64.deb ]; then
             echo "Error: .deb file not found for Ubuntu 20.04"
             exit 1
           fi
