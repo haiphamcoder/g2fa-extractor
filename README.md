@@ -72,7 +72,7 @@ Secret Key: JBSWY3DPEHPK3PXP
 ## 📂 Cấu trúc thư mục
 
 ```text
-g2fa-secret-extractor/
+g2fa-extractor/
 ├── include/                # Chứa các file header (.h)
 ├── src/                    # Chứa các file mã nguồn (.c)
 ├── protobuf/               # Chứa file .proto và file biên dịch từ protobuf
