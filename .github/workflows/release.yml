@@ -23,6 +23,9 @@ jobs:
       - name: Build project
         run: make
 
+      - name: Create directories
+        run: mkdir -p dist/ubuntu-20.04
+
       - name: Package as .deb using dpkg-deb
         run: |
           mkdir -p dist/ubuntu-20.04/g2fa-secret-extractor/usr/local/bin
@@ -34,6 +37,13 @@ jobs:
           echo "Maintainer: Hai Pham Ngoc <ngochai285nd@gmail.com>" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
           echo "Description: G2FA Secret Extractor" >> dist/ubuntu-20.04/g2fa-secret-extractor/DEBIAN/control
           dpkg-deb --build dist/ubuntu-20.04/g2fa-secret-extractor
+
+      - name: Verify .deb file exists
+        run: |
+          if [ ! -f dist/ubuntu-20.04/g2fa-secret-extractor.deb ]; then
+            echo "Error: .deb file not found for Ubuntu 20.04"
+            exit 1
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -53,8 +63,8 @@ jobs:
         with:
           name: g2fa-secret-extractor-ubuntu-20.04
 
-      - name: List downloaded files
-        run: ls -lh dist/
+      - name: List file in dist/ubuntu-20.04
+        run: ls -l dist/ubuntu-20.04
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
