@@ -35,27 +35,29 @@ jobs:
           path: dist/linux/*.deb
 
   build-windows:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: choco install make mingw -y
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y mingw-w64 protobuf-c-compiler libprotobuf-c-dev
 
-      - name: Build project
-        run: make CC=x86_64-w64-mingw32-gcc
+    - name: Build project
+      run: make CC=x86_64-w64-mingw32-gcc CFLAGS="-I/usr/x86_64-w64-mingw32/include"
 
-      - name: Package as .exe
-        run: |
-          mkdir -p dist/windows
-          cp bin/g2fa-extractor.exe dist/windows/
+    - name: Package as .exe
+      run: |
+        mkdir -p dist/windows
+        cp bin/g2fa-extractor.exe dist/windows/
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: g2fa-secret-extractor-windows
-          path: dist/windows/*.exe
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: g2fa-secret-extractor-windows
+        path: dist/windows/*.exe
 
   build-macos:
     runs-on: macos-latest
