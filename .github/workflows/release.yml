@@ -62,6 +62,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: g2fa-secret-extractor-ubuntu-20.04
+          path: dist/ubuntu-20.04/
 
       - name: List file in dist/ubuntu-20.04
         run: ls -l dist/ubuntu-20.04
