@@ -11,13 +11,22 @@ SRC = $(SRC_DIR)/main.c $(SRC_DIR)/base32.c $(SRC_DIR)/base64.c $(SRC_DIR)/urlde
 OBJ = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC))
 TARGET = $(BIN_DIR)/g2fa-extractor
 
-all: $(TARGET)
+.PHONY: all clean prepare
+
+all: prepare $(TARGET)
+
+prepare:
+	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BIN_DIR)
 
 $(TARGET): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
+	@echo "Build completed: $(TARGET)"
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiled: $< -> $@"
 
 clean:
-	rm -f $(BUILD_DIR)/*.o $(TARGET)
+	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	@echo "Cleaned build and bin directories."
